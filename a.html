@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Currency Converter</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin-bottom: 20px;
+      padding:20px;
+      background: url('otherbackground.jpg');
+      background-size: cover;
+      color:rgb(13, 13, 13);
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    #converter-box{
+      background-color: rgb(248, 244, 248);
+      max-width:500px ;
+      float: right;
+      margin-right:50px;
+    }
+    h2 {
+      color: #eb12bc;
+    }
+    section {
+      background: white;
+      margin-bottom: 25px;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      color:#090909;
+    }
+    label, select, input, button {
+      display: block;
+      margin: 10px 0;
+      padding: 8px;
+      width: 100%;
+      color:#090909;
+    }
+    .card {
+      max-width: 599px;
+      max-height:1000px;
+      background: url('background2.jpeg') no-repeat center top ;
+      border-radius: 5px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+      background-size: cover;
+      padding:  20px; 
+      min-height: 25vh;
+      color:#090909;
+    }
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #0a0a0a;
+    }
+    .button {
+      background-color: #0f1010;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .button:hover {
+      background-color: #090909;
+      color:aliceblue
+    }
+    .offline-box {
+      background-color: #ffe0b2;
+      border: 2px solid #f57c00;
+      border: 2px solid;
+      padding: 20px;
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+    .input {
+      padding: 10px;
+      width: 100%;
+      margin-bottom: 10px;
+      border: 1px solid #faf7f7;
+      border-radius: 4px;
+    }
+    .currency-option {
+      padding: 10px;
+      margin: 5px 0;
+      background: #fcf6f6;
+      border-radius: 4px;
+    }
+    .left-side {
+    flex: 1;
+    padding: 20px;
+    max-width: 600px;
+  }
+  .header {
+    font-size: 36px;
+    font-weight: bold;
+    color: #014f86;
+    margin-bottom: 10px;
+  }
+  .tagline {
+    font-size: 20px;
+    color: #023e8a;
+    margin-bottom: 20px;
+    font-style: italic;
+  }
+  .features {
+    margin-top: 20px;
+  }
+  .feature {
+    margin-bottom: 12px;
+    font-size: 18px;
+    background-color: #e0f4ff;
+    padding: 10px 15px;
+    border-radius: 10px;
+    color: #0077b6;
+    box-shadow: 0 2px 6px rgba(0, 119, 182, 0.1);
+  }
+  .left-side p{
+    color:#e0f4ff;
+  }
+  .left-side button{
+    background-color: #f9fbfb;
+      color: rgb(6, 6, 6);
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+  }
+  .left-side .button:hover{
+    background-color: #fbf6f6;
+      color:rgb(8, 8, 8);
+  }
+  </style>
+</head>
+<body>
+<div id="converter-box">
+  <h1 class="text-3xl font-bold text-center">Global Coin Guide</h1>
+  <p class="text-center text-lg mt-2 mb-8">Convert currencies, explore coins, and check payment combinations worldwide.</p>
+
+  <!-- Currency Converter Section -->
+  <div class="card">
+    <h2 class="section-title">Currency Converter</h2>
+    <p>Select two currencies and enter the amount to convert:</p>
+
+    <div>
+      <label for="from-currency">From Currency:</label>
+      <select id="from-currency" class="input">
+        <option value="USD">USD - US Dollar</option>
+        <option value="EUR">EUR - Euro</option>
+        <option value="INR">INR - Indian Rupee</option>
+        <option value="JPY">JPY - Japanese Yen</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="to-currency">To Currency:</label>
+      <select id="to-currency" class="input">
+        <option value="USD">USD - US Dollar</option>
+        <option value="EUR">EUR - Euro</option>
+        <option value="INR">INR - Indian Rupee</option>
+        <option value="JPY">JPY - Japanese Yen</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="amount">Amount:</label>
+      <input type="number" id="amount" class="input" placeholder="Enter amount to convert" />
+    </div>
+
+    <button class="button" onclick="convertCurrency()">Convert</button>
+
+    <div id="conversion-result" class="mt-4"></div>
+  </div>
+
+  <!-- Currency Info Section -->
+  <div class="card">
+      <h2 class="section-title">Currency Info</h2>
+      <p>Select a country to see its official currency and conversion rate:</p>
+
+      <select id="country-select" class="input" onchange="fetchCurrencyInfo()">
+        <option value="USD">United States - USD</option>
+        <option value="EUR">Germany - EUR</option>
+        <option value="INR">India - INR</option>
+        <option value="JPY">Japan - JPY</option>
+      </select>
+      <div id="currency-info" class="mt-4"></div>
+  </div>
+
+  <!-- Section 1: Accepted Forms of Payment -->
+  <div class="card">
+      <h2>Accepted Forms of Payment</h2>
+      <label for="countryPayment">Select Country:</label>
+      <select id="countryPayment" class="input">
+        <option value="">--Select--</option>
+        <option value="India">India</option>
+        <option value="USA">USA</option>
+        <option value="Japan">Japan</option>
+      </select>
+      <div id="paymentInfo"></div>
+  </div>
+  <!-- Section 2: Currency Breakdown -->
+  <div class="card">
+        <h2>If You Had - Currency Breakdown</h2>
+        <label for="breakdownCountry">Select Country</label>
+        <select id="breakdownCountry" class="input" >
+          <option value="">--Select--</option>
+          <option value="India">India</option>
+          <option value="USA">USA</option>
+        </select>
+        <label for="cashAmount">Enter Amount:</label>
+        <input type="number" id="cashAmount" class="input" placeholder="e.g. 500" />
+        <button onclick="calculateBreakdown()">Get Breakdown</button>
+      <div id="breakdownResult"></div>
+  </div>
+  <!-- Section 3: Language Tips -->
+  <div class="card">
+    <h2>Language Tips</h2>
+    <label for="langCountry">Select Country:</label>
+      <select id="langCountry" class="input">
+        <option value="">--Select--</option>
+        <option value="France">France</option>
+        <option value="Japan">Japan</option>
+        <option value="India">India</option>
+      </select>
+      <div id="languageTips"></div>
+  </div>
+  <!-- Section 4: Fake vs Real Tips -->
+  <div class="card">
+    <h2>Fake vs Real Currency Tips</h2>
+    <label for="currencyCheck">Select Country:</label>
+      <select id="currencyCheck" class="input">
+        <option value="">--Select--</option>
+        <option value="India">India</option>
+        <option value="USA">USA</option>
+      </select>
+      <div id="currencyTipResult"></div>
+  </div>
+
+  <!-- Section 5: Offline Utility -->
+  <div class="card">
+    <section id="offlineMessage" class="offline-box" style="display: none;">
+        <h3>You are currently offline</h3>
+        <p>This tool still provides basic information:</p>
+        <ul>
+          <li>Currency breakdown (last used)</li>
+          <li>Language tips (cached)</li>
+          <li>Real vs Fake currency tips</li>
+       </ul>
+    </section>
+  </div>
+  <!-- Section 6: Value Checker -->
+  <div class="card">
+       <h2>Value Checker</h2>
+        <label for="valueCurrency">Select Country:</label>
+        <select id="valueCurrency" class="input">
+          <option value="">--Select--</option>
+          <option value="India">India</option>
+          <option value="USA">USA</option>
+          <option value="Japan">Japan</option>
+        </select>
+        <label for="valueAmount">Enter Amount:</label>
+        <input type="number" id="valueAmount" />
+        <button onclick="checkCurrencyValue()">Check</button>
+        <div id="valueCheckResult"></div>
+  </div>
+  <!-- Fake vs Real Tips Section -->
+  <div class="card">
+    <h2 class="section-title">Fake vs Real Currency Tips</h2>
+    <p>Learn how to identify fake currency with these tips:</p>
+      <ul>
+        <li>Look for watermarks on the currency paper.</li>
+        <li>Check for holograms in the currency design.</li>
+        <li>Examine the currency under UV light for hidden features.</li>
+        <li>Ensure the print quality is sharp and precise.</li>
+      </ul>
+  </div>
+</div>
+  <div class="left-side">
+    <div class="header">Global Currency Dashboard</div>
+    <div class="tagline"> The Sections of The Website are given below</div>
+    <div class="features">
+      <div class="feature">Real-Time Currency Conversion Section</div>
+      <div class="feature">Currency Info Section</div>
+      <div class="feature">Accepted Forms of Payment Section</div>
+      <div class="feature">Currency Breakdown Section</div>
+      <div class="feature">Language Tips Section</div>
+      <div class="feature">Fake vs Real Tips Section</div>
+      <div class="feature">Offline Utility Section</div>
+      <div class="feature">Value Checker Section</div>
+    </div>
+    <p>To know about the Developers click here </p>
+    <button class="start-button" onclick="location.href='info.html'">Developers</button>
+</div>  
+<script>
+  const API_KEY = '918ebe487cde095bc118e617';  // Your API key from exchangerate-api
+
+// Currency conversion logic
+function convertCurrency() {
+  const fromCurrency = document.getElementById("from-currency").value;
+  const toCurrency = document.getElementById("to-currency").value;
+  const amount = document.getElementById("amount").value;
+
+  if (!amount) {
+    alert("Please enter an amount to convert.");
+    return;
+  }
+  const url = `https://v6.exchangerate-api.com/v6/${API_KEY}/latest/${fromCurrency}`;
+
+  axios.get(url)
+    .then(response => {
+      const conversionRate = response.data.conversion_rates[toCurrency];
+      const convertedAmount = (amount * conversionRate).toFixed(2);
+      document.getElementById("conversion-result").innerHTML = `${amount} ${fromCurrency} is equal to ${convertedAmount} ${toCurrency}`;
+    })
+    .catch(error => {
+      console.error("Error converting currency:", error);
+      alert("There was an error with the currency conversion.");
+    });
+}
+
+// Fetch currency information
+function fetchCurrencyInfo() {
+  const selectedCountry = document.getElementById("country-select").value;
+  const countryInfo = {
+    'USD': { name: "United States", currency: "USD", rate: "1 USD = 1 USD", denominations: "Coins: 1¢, 5¢, 10¢, 25¢, 50¢, $1; Notes: $1, $5, $10, $20, $50, $100" },
+    'EUR': { name: "Germany", currency: "EUR", rate: "1 EUR = 1 EUR", denominations: "Coins: 1c, 2c, 5c, 10c, 20c, 50c, €1, €2; Notes: €5, €10, €20, €50, €100, €200, €500" },
+    'INR': { name: "India", currency: "INR", rate: "1 INR = 0.014 USD", denominations: "Coins: ₹1, ₹2, ₹5, ₹10; Notes: ₹10, ₹20, ₹50, ₹100, ₹200, ₹500, ₹2000" },
+    'JPY': { name: "Japan", currency: "JPY", rate: "1 JPY = 0.009 USD", denominations: "Coins: ¥1, ¥5, ¥10, ¥50, ¥100, ¥500; Notes: ¥1000, ¥5000, ¥10000" }
+  };
+
+  const info = countryInfo[selectedCountry];
+  const infoHTML = `
+    <h3>Currency: ${info.currency}</h3>
+    <p>Country: ${info.name}</p>
+    <p>Conversion Rate: ${info.rate}</p>
+    <p>Denominations: ${info.denominations}</p>
+  `;
+
+  document.getElementById("currency-info").innerHTML = infoHTML;
+}
+// Accepted Forms of Payment
+const paymentData = {
+  India: "Cash, UPI (PhonePe, Google Pay), Credit/Debit Cards.",
+  USA: "Cash, Credit/Debit Cards, Apple Pay, Google Wallet.",
+  Japan: "Cash, Suica card, Credit Cards, PayPay."
+};
+document.getElementById("countryPayment").addEventListener("change", function () {
+  const val = this.value;
+  document.getElementById("paymentInfo").innerText = paymentData[val] || "";
+});
+
+// Currency Breakdown
+function calculateBreakdown() {
+  const country = document.getElementById("breakdownCountry").value;
+  const amount = parseInt(document.getElementById("cashAmount").value);
+  const result = document.getElementById("breakdownResult");
+  result.innerHTML = "";
+  if (!country || !amount || amount <= 0) {
+    result.innerText = "Please select a valid country and amount.";
+    return;
+  }
+
+  const denominations = {
+    India: [2000, 500, 200, 100, 50, 20, 10, 5, 2, 1],
+    USA: [100, 50, 20, 10, 5, 1]
+  };
+
+  const selected = denominations[country];
+  let breakdown = "";
+  let remaining = amount;
+
+  selected.forEach(den => {
+    const count = Math.floor(remaining / den);
+    if (count > 0) {
+      breakdown += `${count} x ${den} ${country === "India" ? "INR" : "USD"}<br>`;
+      remaining %= den;
+    }
+  });
+
+  result.innerHTML = breakdown || "No breakdown possible.";
+}
+
+// Language Tips
+const languageData = {
+  France: { Hello: "Bonjour", ThankYou: "Merci", Bye: "Au revoir" },
+  Japan: { Hello: "Konnichiwa", ThankYou: "Arigatou", Bye: "Sayonara" },
+  India: { Hello: "Namaste", ThankYou: "Dhanyavaad", Bye: "Alvida" }
+};
+document.getElementById("langCountry").addEventListener("change", function () {
+  const val = this.value;
+  const tips = languageData[val];
+  let html = "";
+  for (let key in tips) {
+    html += `<strong>${key}</strong>: ${tips[key]}<br>`;
+  }
+  document.getElementById("languageTips").innerHTML = html;
+});
+
+// Fake vs Real Currency
+const currencyTips = {
+  India: [
+    "Real notes have Gandhi watermark.",
+    "Security thread glows under UV light.",
+    "Fake notes may miss raised printing."
+  ],
+  USA: [
+    "Real bills have color-shifting ink.",
+    "Watermark matches president's face.",
+    "Fake bills often lack microprinting."
+  ]
+};
+document.getElementById("currencyCheck").addEventListener("change", function () {
+  const tips = currencyTips[this.value];
+  let html = "<ul>";
+  if (tips) {
+    tips.forEach(tip => {
+      html += `<li>${tip}</li>`;
+    });
+  }
+  html += "</ul>";
+  document.getElementById("currencyTipResult").innerHTML = html;
+});
+
+// Offline Detector
+function updateOfflineStatus() {
+  document.getElementById("offlineMessage").style.display = navigator.onLine ? "none" : "block";
+}
+window.addEventListener('load', updateOfflineStatus);
+window.addEventListener('online', updateOfflineStatus);
+window.addEventListener('offline', updateOfflineStatus);
+
+// Value Checker
+const valueInsights = {
+  India: [
+    { range: [10, 50], tip: "Street food snack or bottled water" },
+    { range: [51, 200], tip: "Meal at a local eatery" },
+    { range: [201, 500], tip: "Cab ride or small grocery trip" }
+  ],
+  USA: [
+    { range: [1, 5], tip: "Snack or drink" },
+    { range: [6, 20], tip: "Fast food combo" },
+    { range: [21, 100], tip: "Meal or basic grocery run" }
+  ],
+  Japan: [
+    { range: [100, 500], tip: "Convenience store item" },
+    { range: [501, 1500], tip: "Ramen or train fare" },
+    { range: [1501, 5000], tip: "Casual dining or small gift" }
+  ]
+};
+
+function checkCurrencyValue() {
+  const country = document.getElementById("valueCurrency").value;
+  const amount = parseFloat(document.getElementById("valueAmount").value);
+  const result = document.getElementById("valueCheckResult");
+  if (country && amount && valueInsights[country]) {
+    const tips = valueInsights[country];
+    let message = "Unable to estimate.";
+    tips.forEach(t => {
+      if (amount >= t.range[0] && amount <= t.range[1]) {
+        message = `This can get you: ${t.tip}`;
+      }
+    });
+    result.innerHTML = message;
+  } else {
+    result.innerHTML = "Please select a country and enter a valid amount.";
+  }
+}
+  </script>
+</body>
+</html>
